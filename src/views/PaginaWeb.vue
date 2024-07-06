@@ -7,12 +7,14 @@
 
     <div class="container mt-4">
       <div v-if="news.length" class="news-list">
-        <div v-for="(item, index) in news" :key="index" class="news-item mb-4">
+        <div v-for="item in news" :key="item.id" class="news-item mb-4">
           <br>
           <h3 style="text-align:center">{{ item.title }}</h3>
-          <img v-if="item.image" :src="item.image" alt="Noticia" class="img-fluid" />
+          <img v-if="item.image" :src="item.image" alt="Noticia" style="display:block;margin-left:auto;margin-right:auto;width:50%" class="img-fluid" />
           <br><br>
           <p style="text-align:center">{{ item.content }}</p>
+          <!-- Botón de eliminar -->
+          <button @click="deleteNews(item.id)" class="btn btn-danger">Eliminar</button>
         </div>
       </div>
 
@@ -39,7 +41,7 @@
 </template>
 
 <script>
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/assets/utils/firebase'; // Ajusta la ruta según tu estructura de carpetas
 
 export default {
@@ -71,10 +73,10 @@ export default {
           console.log('Enviando noticia:', newPost); // Verifica los datos que se están enviando
 
           // Guardar noticia en Firestore
-          await addDoc(collection(db, 'news'), newPost);
+          const docRef = await addDoc(collection(db, 'news'), newPost);
 
-          // Actualizar la lista de noticias
-          this.news.push(newPost);
+          // Actualizar la lista de noticias con el ID del documento
+          this.news.push({ ...newPost, id: docRef.id });
 
           // Limpiar el formulario y cerrar el modal
           this.title = '';
@@ -88,13 +90,27 @@ export default {
       } else {
         alert('Por favor, complete todos los campos.');
       }
+    },
+    async deleteNews(newsId) {
+      try {
+        // Eliminar noticia de Firestore
+        await deleteDoc(doc(db, 'news', newsId));
+
+        // Actualizar la lista de noticias local
+        this.news = this.news.filter(item => item.id !== newsId);
+        
+        alert('Noticia eliminada con éxito.');
+      } catch (error) {
+        console.error("Error al eliminar el documento: ", error);
+        alert('Hubo un problema al eliminar la noticia. Verifica la consola para más detalles.');
+      }
     }
   },
   async mounted() {
     try {
       // Cargar noticias desde Firestore
       const querySnapshot = await getDocs(collection(db, 'news'));
-      this.news = querySnapshot.docs.map(doc => doc.data());
+      this.news = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       console.log('Noticias cargadas:', this.news); // Verifica las noticias cargadas
     } catch (error) {
       console.error("Error al obtener los documentos: ", error);
@@ -145,5 +161,9 @@ export default {
   padding: 16px;
   border-radius: 5px;
   background-color: #f9f9f9;
+}
+
+.btn-danger {
+  margin-top: 10px; /* Espacio para separar el botón del contenido */
 }
 </style>

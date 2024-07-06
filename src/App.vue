@@ -12,6 +12,7 @@
 import PaginaComponent from './views/PaginaComponent.vue'; 
 import PaginaWeb from './views/PaginaWeb.vue';
 
+
 export default {
   name: 'App',
   components: {
