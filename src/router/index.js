@@ -1,29 +1,39 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import PaginaComponent from '../views/PaginaComponent.vue';
+import PaginaWeb from '../views/PaginaWeb.vue';
+import CreateNews from '../views/CreateNews.vue';
+import NewsList from '../views/NewsList.vue';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'PaginaComponent',
+    component: PaginaComponent
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/pagina-web',
+    name: 'PaginaWeb',
+    component: PaginaWeb
+  },
+  {
+    path: '/news-list',
+    name: 'NewsList',
+    component: NewsList // Cambiado a NewsList
+  },
+  {
+    path: '/create-news',
+    name: 'CreateNews',
+    component: CreateNews // Cambiado a CreateNews
   }
-]
+];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
-})
+});
 
-export default router
+export default router;
